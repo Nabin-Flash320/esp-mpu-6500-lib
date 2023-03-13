@@ -6,7 +6,7 @@
 
 void app_main()
 {
-   MPU_6500_lib();
+   MPU_6500_lib_initialize();
 }
 
 

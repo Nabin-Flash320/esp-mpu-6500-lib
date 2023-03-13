@@ -87,8 +87,8 @@
 
 
 // ****************************** Datas for MPU_USER_CTRL_REGISTER ******************************
-// [7]
-#define MPU_USER_CTRL_REGISTER_DMP_DISABLE                                              0x00
+// [7] // Digital Motion Processing(DMP)
+#define MPU_USER_CTRL_REGISTER_DMP_DISABLE                                              0x00 
 #define MPU_USER_CTRL_REGISTER_DMP_ENABLE                                               0x80
 // [6]
 #define MPU_USER_CTRL_REGISTER_FIFO_DISABLE                                             0x00
@@ -113,6 +113,7 @@
 #define MPU_POWER_MANGEMENT_REGISTER_1_DEVICE_RESET                                     0x80
 // [6]
 #define MPU_POWER_MANGEMENT_REGISTER_1_DEVICE_SLEEP                                     0x40
+#define MPU_POWER_MANGEMENT_REGISTER_1_DEVICE_WAKE                                      0x00
 // [5]
 #define MPU_POWER_MANGEMENT_REGISTER_1_DEVICE_CYCLE                                     0x20
 // [4]
