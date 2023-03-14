@@ -10,8 +10,15 @@
 #include "MPU_6500_datas.h"
 
 static void mpu_6500_i2c_init();
-static void mpu_6500_reset_device_and_wake();
 static uint8_t mpu_6500_who_am_i();
+// ---------------- MPU 6500 configs ----------------
+static esp_err_t mpu_6500_reset_device_and_wake();
+static esp_err_t mpu_6500_select_clock_source(uint8_t clock_source);
+static esp_err_t mpu_6500_set_gyro_full_scale(uint8_t full_scale);
+static esp_err_t mpu_6500_set_accel_full_scale(uint8_t full_scale);
+static esp_err_t mpu_6500_set_dlpf_config(uint8_t dlpf_config);
+static esp_err_t mpu_6500_set_sample_divider(uint8_t sample_divider);
+// **************************************************
 static esp_err_t read_reg(uint8_t *data, uint8_t register_addr);
 static esp_err_t write_reg(uint8_t data, uint8_t register_addr);
 
@@ -20,18 +27,20 @@ void MPU_6500_lib_initialize()
 {
     // Initialize I2C protocol
     mpu_6500_i2c_init();
+    ESP_LOGI(MPU_TAG, "(%d, func: %s) I2C was initialized successfully.\n", GET_LINE, __func__);
 
-    // Reset the device.
-
-    // Wake up the device
-
-    // Set values to "MPU_USER_CTRL_REGISTER" according to requirements.
-
-
-    ESP_LOGI(MPU_TAG, "(%d, func: %s) I2C was initialized successfully.", GET_LINE, __func__);
+    ESP_LOGE(MPU_TAG, "---------------- MPU 6500 configs ----------------");
     mpu_6500_reset_device_and_wake();
-    mpu_6500_who_am_i();
+    mpu_6500_select_clock_source(MPU_POWER_MANGEMENT_REGISTER_1_SELECT_BEST_CLOCK_SOURCE);
+    mpu_6500_set_gyro_full_scale(MPU_GYRO_CONFIG_REGISTER_FULL_SCALE_500_DPS);
+    mpu_6500_set_accel_full_scale(MPU_ACCEL_CONFIG_REGISTER_FULL_SCALE_4G);
+    mpu_6500_set_dlpf_config(MPU_CONFIG_REGISTER_DLPF_CONFIG_41_HZ);
+    mpu_6500_set_sample_divider(100);
+    ESP_LOGE(MPU_TAG, "**************************************************\n");
 
+    // Checking the identity of the device.
+    uint8_t identity = mpu_6500_who_am_i();
+    ESP_LOGI(MPU_TAG, "(%d, func: %s) Value of WHO_AM_I_REGISTER is 0x%x", GET_LINE, __func__, identity);
 }
 
 static void mpu_6500_i2c_init()
@@ -68,7 +77,7 @@ static void mpu_6500_i2c_init()
 
 }
 
-static void mpu_6500_reset_device_and_wake()
+static esp_err_t mpu_6500_reset_device_and_wake()
 {
     // Resetting device by setting bit 7 of the power managment 1 register.
     esp_err_t error = write_reg(MPU_POWER_MANGEMENT_REGISTER_1_DEVICE_RESET, MPU_POWER_MANGEMENT_REGISTER_1);
@@ -91,14 +100,100 @@ static void mpu_6500_reset_device_and_wake()
     {
         ESP_LOGI(MPU_TAG, "(%d, func: %s) Device awakened successfully.", GET_LINE, __func__);
     }
+    return error;
+}
+
+static esp_err_t mpu_6500_select_clock_source(uint8_t clock_source)
+{
+    esp_err_t error = ESP_OK;
+
+    error = write_reg(clock_source, MPU_POWER_MANGEMENT_REGISTER_1);
+    if(ESP_OK != error)
+    {
+        ESP_LOGE(MPU_TAG, "(%d, func: %s) Couldn't select clock source.", GET_LINE, __func__);
+    }
+    else 
+    {
+        uint8_t clock = 0;
+        error = read_reg(&clock, MPU_POWER_MANGEMENT_REGISTER_1);
+        ESP_LOGI(MPU_TAG, "(%d, func: %s) Clock setting is 0x%x", GET_LINE, __func__, (0x0F & clock));
+    }
+    return error;
+}
+
+static esp_err_t mpu_6500_set_gyro_full_scale(uint8_t full_scale)
+{
+    esp_err_t error = ESP_OK;
+    error = write_reg(full_scale, MPU_GYRO_CONFIG_REGISTER);
+    if(ESP_OK != error)
+    {
+        ESP_LOGE(MPU_TAG, "(%d, func: %s) Couldn't configure gyro full scale.", GET_LINE, __func__);
+    }
+    else 
+    {
+        uint8_t gyro_full_scale = 0;
+        error = read_reg(&gyro_full_scale, MPU_GYRO_CONFIG_REGISTER);
+        ESP_LOGI(MPU_TAG, "(%d, func: %s) Gyro full scale setting is 0x%x", GET_LINE, __func__, (0x18 & gyro_full_scale));
+    }
+    return error;
+}
+
+static esp_err_t mpu_6500_set_accel_full_scale(uint8_t full_scale)
+{
+    esp_err_t error = ESP_OK;
+    error = write_reg(full_scale, MPU_ACCEL_CONFIG_REGISTER);
+    if(ESP_OK != error)
+    {
+        ESP_LOGE(MPU_TAG, "(%d, func: %s) Couldn't configure acceleration full scale.", GET_LINE, __func__);
+    }
+    else 
+    {
+        uint8_t accel_full_scale = 0;
+        error = read_reg(&accel_full_scale, MPU_ACCEL_CONFIG_REGISTER);
+        ESP_LOGI(MPU_TAG, "(%d, func: %s) Accelerometer full scale setting is 0x%x", GET_LINE, __func__, (0x18 & accel_full_scale));
+    }
+    return error;
+}
+
+static esp_err_t mpu_6500_set_dlpf_config(uint8_t dlpf_config)
+{
+    esp_err_t error = ESP_OK;
+    error = write_reg(dlpf_config, MPU_CONFIG_REGISTER);
+    if(ESP_OK != error)
+    {
+        ESP_LOGE(MPU_TAG, "(%d, func: %s) Couldn't configure DLPF.", GET_LINE, __func__);
+    }
+    else 
+    {
+        uint8_t dlpf_config = 0;
+        error = read_reg(&dlpf_config, MPU_CONFIG_REGISTER);
+        ESP_LOGI(MPU_TAG, "(%d, func: %s) DLPF setting is 0x%x", GET_LINE, __func__, (0x07 & dlpf_config));
+    }
+    return error;
+}
+
+static esp_err_t mpu_6500_set_sample_divider(uint8_t sampling_rate)
+{
+    esp_err_t error = ESP_OK;
+    uint16_t mpu_6500_internal_sampling_rate = 1000;
+    uint16_t mpu_6500_divider_value = (mpu_6500_internal_sampling_rate / sampling_rate) - 1;
+    error = write_reg((uint8_t)mpu_6500_divider_value, MPU_SMPLRT_DIV_REGISTER);
+    if(ESP_OK != error)
+    {
+        ESP_LOGE(MPU_TAG, "(%d, func: %s) Couldn't write to the sample rate divider register.", GET_LINE, __func__);
+    }
+    else 
+    {
+        ESP_LOGI(MPU_TAG, "(%d, func: %s) Sampling rate is %d and the divider value %d", GET_LINE, __func__, sampling_rate, mpu_6500_divider_value);
+    }
+    return error;
 }
 
 static uint8_t mpu_6500_who_am_i()
 {
-    uint8_t who_am_i = 0;
-    read_reg(&who_am_i, MPU_WHO_AM_I_REGISTER);
-    ESP_LOGI(MPU_TAG, "(%d, func: %s) Value of WHO_AM_I_REGISTER is 0x%x", GET_LINE, __func__, who_am_i);
-    return who_am_i; 
+    uint8_t identity = 0;
+    read_reg(&identity, MPU_WHO_AM_I_REGISTER);
+    return identity; 
 }
 
 static esp_err_t write_reg(uint8_t data, uint8_t register_addr)

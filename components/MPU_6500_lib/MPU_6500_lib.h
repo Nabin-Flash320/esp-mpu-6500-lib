@@ -16,7 +16,6 @@
 
 
 
-
 void MPU_6500_lib_initialize();
 
 #endif //_MPU_6500_LIB_H_

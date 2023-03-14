@@ -8,6 +8,11 @@
 #define MPU_CONFIG_REGISTER_FIFO_MODE_BIT_ADDITIONAL_WRITE                              0x20
 // [5:3]
 #define MPU_CONFIG_REGISTER_EXT_SYNC_SET_FUNCTION_DISABLED                              0x00 
+// [2:0]
+#define MPU_CONFIG_REGISTER_DLPF_CONFIG_184_HZ                                          0x01
+#define MPU_CONFIG_REGISTER_DLPF_CONFIG_92_HZ                                           0x02
+#define MPU_CONFIG_REGISTER_DLPF_CONFIG_41_HZ                                           0x03
+#define MPU_CONFIG_REGISTER_DLPF_CONFIG_20_HZ                                           0x04
 // ------------------------------ Datas for MPU_CONFIG_REGISTER ------------------------------
 
 
@@ -123,8 +128,8 @@
 #define MPU_POWER_MANGEMENT_REGISTER_1_TEMPERATURE_ENABLE                               0x00
 // [2:0]
 #define MPU_POWER_MANGEMENT_REGISTER_1_SELECT_INTERNAL_OSCILLATOR                       0x00
-#define MPU_POWER_MANGEMENT_REGISTER_1_SELECT_BEST_CLOCK_SOURCE                         0x10
-#define MPU_POWER_MANGEMENT_REGISTER_1_STOPO_CLOCK_AND_RESET_TIMING_GENERATOR           0x10
+#define MPU_POWER_MANGEMENT_REGISTER_1_SELECT_BEST_CLOCK_SOURCE                         0x03  
+#define MPU_POWER_MANGEMENT_REGISTER_1_STOP_CLOCK_AND_RESET_TIMING_GENERATOR            0x07
 // ------------------------------ Datas for MPU_POWER_MANGEMENT_REGISTER_1 -----------------------------
 
 
