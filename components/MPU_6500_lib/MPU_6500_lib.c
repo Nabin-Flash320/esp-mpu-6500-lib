@@ -5,6 +5,7 @@
 #include "driver/i2c.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "string.h"
 #include "MPU_6500_lib.h"
 #include "MPU_6500_registers.h"
 #include "MPU_6500_datas.h"
@@ -41,6 +42,40 @@ void MPU_6500_lib_initialize()
     // Checking the identity of the device.
     uint8_t identity = mpu_6500_who_am_i();
     ESP_LOGI(MPU_TAG, "(%d, func: %s) Value of WHO_AM_I_REGISTER is 0x%x", GET_LINE, __func__, identity);
+}
+
+accel_data_t* get_accelerometer_data()
+{
+    accel_data_t* accel_data = (accel_data_t*)malloc(sizeof(accel_data_t));
+    memset(accel_data, 0, sizeof(accel_data_t));
+
+    read_reg(&accel_data->accel_x_data.register_h_data, MPU_ACCEL_XOUT_REGISTER_H);
+    read_reg(&accel_data->accel_x_data.register_l_data, MPU_ACCEL_XOUT_REGISTER_L);
+
+    read_reg(&accel_data->accel_y_data.register_h_data, MPU_ACCEL_YOUT_REGISTER_H);
+    read_reg(&accel_data->accel_y_data.register_l_data, MPU_ACCEL_YOUT_REGISTER_L);
+
+    read_reg(&accel_data->accel_z_data.register_h_data, MPU_ACCEL_ZOUT_REGISTER_H);
+    read_reg(&accel_data->accel_z_data.register_l_data, MPU_ACCEL_ZOUT_REGISTER_L);
+
+    return accel_data;
+}
+
+gyro_data_t* get_gyroscope_data()
+{
+    gyro_data_t* gyro_data = (gyro_data_t*)malloc(sizeof(gyro_data_t));
+    memset(gyro_data, 0, sizeof(gyro_data_t));
+
+    read_reg(&gyro_data->gyro_x_data.register_h_data, MPU_GYRO_XOUT_REGISTER_H);
+    read_reg(&gyro_data->gyro_x_data.register_l_data, MPU_GYRO_XOUT_REGISTER_L);
+
+    read_reg(&gyro_data->gyro_y_data.register_h_data, MPU_GYRO_YOUT_REGISTER_H);
+    read_reg(&gyro_data->gyro_y_data.register_l_data, MPU_GYRO_YOUT_REGISTER_L);
+
+    read_reg(&gyro_data->gyro_z_data.register_h_data, MPU_GYRO_ZOUT_REGISTER_H);
+    read_reg(&gyro_data->gyro_z_data.register_l_data, MPU_GYRO_ZOUT_REGISTER_L);
+
+    return gyro_data;
 }
 
 static void mpu_6500_i2c_init()
@@ -224,3 +259,5 @@ static esp_err_t read_reg(uint8_t *data, uint8_t register_addr)
     i2c_cmd_link_delete(cmd);
     return ESP_OK;
 }
+
+ 
