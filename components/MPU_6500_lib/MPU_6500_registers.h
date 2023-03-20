@@ -59,9 +59,10 @@
 #define MPU_ACCEL_CONFIG_REGISTER           0x1C
     /* "MPU_ACCEL_CONFIG_REGISTER_2"
             Second 8-bit R/W register that configures accelerometer in MPU-6500
-                1. [7:4] -> Reserved
-                2. [3] -> Used to bypass DLPF
-                3. [2:0] -> Accelerometer low pass filter setting
+                1. [7:6] -> Reserved
+                2. [5:4] -> Reserved
+                3. [3] -> Used to bypass DLPF
+                4. [2:0] -> Accelerometer low pass filter setting
     */
 #define MPU_ACCEL_CONFIG_REGISTER_2         0x1D
 // ****************************** MPU config registers ******************************

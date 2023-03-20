@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "mpu_6500_lib.h": "c"
+        "adc_types.h": "c",
+        "foundation.h": "c",
+        "mesh_byteorder.h": "c",
+        "health_srv.h": "c"
     }
 }

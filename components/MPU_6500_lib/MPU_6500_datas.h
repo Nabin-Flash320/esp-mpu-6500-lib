@@ -56,9 +56,16 @@
 
 // ****************************** Datas for MPU_ACCEL_CONFIG_REGISTER_2 ******************************
 // [3]
-#define MPU_ACCEL_CONFIG_REGISTER_DLPF_BYPASS                                           0x00
+#define MPU_ACCEL_CONFIG_REGISTER_DLPF_ENABLE                                           0x01
+#define MPU_ACCEL_CONFIG_REGISTER_DLPF_DISABLE                                          0x00
 // [2:0]
-#define MPU_ACCEL_CONFIG_REGISTER_DLPF_CONFIG                                           0x00
+#define MPU_ACCEL_CONFIG_REGISTER_DLPF_CONFIG_460HZ                                     0x00
+#define MPU_ACCEL_CONFIG_REGISTER_DLPF_CONFIG_184                                       0x01
+#define MPU_ACCEL_CONFIG_REGISTER_DLPF_CONFIG_92HZ                                      0x02
+#define MPU_ACCEL_CONFIG_REGISTER_DLPF_CONFIG_41HZ                                      0x03
+#define MPU_ACCEL_CONFIG_REGISTER_DLPF_CONFIG_20HZ                                      0x04
+#define MPU_ACCEL_CONFIG_REGISTER_DLPF_CONFIG_10HZ                                      0x05
+#define MPU_ACCEL_CONFIG_REGISTER_DLPF_CONFIG_5HZ                                       0x06
 // ------------------------------ Datas for MPU_ACCEL_CONFIG_REGISTER_2 -----------------------------
 
 
@@ -128,7 +135,7 @@
 #define MPU_POWER_MANGEMENT_REGISTER_1_TEMPERATURE_ENABLE                               0x00
 // [2:0]
 #define MPU_POWER_MANGEMENT_REGISTER_1_SELECT_INTERNAL_OSCILLATOR                       0x00
-#define MPU_POWER_MANGEMENT_REGISTER_1_SELECT_BEST_CLOCK_SOURCE                         0x03  
+#define MPU_POWER_MANGEMENT_REGISTER_1_SELECT_BEST_CLOCK_SOURCE                         0x01  
 #define MPU_POWER_MANGEMENT_REGISTER_1_STOP_CLOCK_AND_RESET_TIMING_GENERATOR            0x07
 // ------------------------------ Datas for MPU_POWER_MANGEMENT_REGISTER_1 -----------------------------
 

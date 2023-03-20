@@ -11,13 +11,14 @@
 #include "MPU_6500_datas.h"
 
 static void mpu_6500_i2c_init();
-static uint8_t mpu_6500_who_am_i();
+
 // ---------------- MPU 6500 configs ----------------
 static esp_err_t mpu_6500_reset_device_and_wake();
 static esp_err_t mpu_6500_select_clock_source(uint8_t clock_source);
 static esp_err_t mpu_6500_set_gyro_full_scale(uint8_t full_scale);
 static esp_err_t mpu_6500_set_accel_full_scale(uint8_t full_scale);
 static esp_err_t mpu_6500_set_dlpf_config(uint8_t dlpf_config);
+static esp_err_t mpu_6500_set_accel_dlfp_config(uint8_t dlpf_setting);
 static esp_err_t mpu_6500_set_sample_divider(uint8_t sample_divider);
 // **************************************************
 static esp_err_t read_reg(uint8_t *data, uint8_t register_addr);
@@ -33,10 +34,11 @@ void MPU_6500_lib_initialize()
     ESP_LOGE(MPU_TAG, "---------------- MPU 6500 configs ----------------");
     mpu_6500_reset_device_and_wake();
     mpu_6500_select_clock_source(MPU_POWER_MANGEMENT_REGISTER_1_SELECT_BEST_CLOCK_SOURCE);
-    mpu_6500_set_gyro_full_scale(MPU_GYRO_CONFIG_REGISTER_FULL_SCALE_500_DPS);
-    mpu_6500_set_accel_full_scale(MPU_ACCEL_CONFIG_REGISTER_FULL_SCALE_4G);
+    mpu_6500_set_accel_dlfp_config(MPU_ACCEL_CONFIG_REGISTER_DLPF_ENABLE | MPU_ACCEL_CONFIG_REGISTER_DLPF_CONFIG_10HZ);
     mpu_6500_set_dlpf_config(MPU_CONFIG_REGISTER_DLPF_CONFIG_41_HZ);
     mpu_6500_set_sample_divider(100);
+    mpu_6500_set_gyro_full_scale(MPU_GYRO_CONFIG_REGISTER_FULL_SCALE_500_DPS);
+    mpu_6500_set_accel_full_scale(MPU_ACCEL_CONFIG_REGISTER_FULL_SCALE_4G);
     ESP_LOGE(MPU_TAG, "**************************************************\n");
 
     // Checking the identity of the device.
@@ -200,9 +202,26 @@ static esp_err_t mpu_6500_set_dlpf_config(uint8_t dlpf_config)
     }
     else 
     {
+        uint8_t dlpf_cfg = 0;
+        error = read_reg(&dlpf_cfg, MPU_CONFIG_REGISTER);
+        ESP_LOGI(MPU_TAG, "(%d, func: %s) DLPF setting is 0x%x", GET_LINE, __func__, (0x07 & dlpf_cfg));
+    }
+    return error;
+}
+
+static esp_err_t mpu_6500_set_accel_dlfp_config(uint8_t dlpf_setting)
+{
+    esp_err_t error = ESP_OK;
+    error = write_reg(dlpf_setting, MPU_ACCEL_CONFIG_REGISTER_2);
+    if(ESP_OK != error)
+    {
+        ESP_LOGE(MPU_TAG, "(%d, func: %s) Couldn't configure DLPF for accelerometer.", GET_LINE, __func__);
+    }
+    else 
+    {
         uint8_t dlpf_config = 0;
-        error = read_reg(&dlpf_config, MPU_CONFIG_REGISTER);
-        ESP_LOGI(MPU_TAG, "(%d, func: %s) DLPF setting is 0x%x", GET_LINE, __func__, (0x07 & dlpf_config));
+        error = read_reg(&dlpf_config, MPU_ACCEL_CONFIG_REGISTER_2);
+        ESP_LOGI(MPU_TAG, "(%d, func: %s) DLPF accelerometer setting is 0x%x", GET_LINE, __func__, (0x07 & dlpf_config));
     }
     return error;
 }
@@ -224,7 +243,7 @@ static esp_err_t mpu_6500_set_sample_divider(uint8_t sampling_rate)
     return error;
 }
 
-static uint8_t mpu_6500_who_am_i()
+uint8_t mpu_6500_who_am_i()
 {
     uint8_t identity = 0;
     read_reg(&identity, MPU_WHO_AM_I_REGISTER);

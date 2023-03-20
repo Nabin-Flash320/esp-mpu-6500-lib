@@ -21,6 +21,11 @@
 #define MPU_6500_ACCEL_8G_FULL_SCALE_RESOLUTION         0.000244 // 0.000244g/LSB
 #define MPU_6500_ACCEL_16G_FULL_SCALE_RESOLUTION        0.000488 // 0.000488g/LSB
 
+#define MPU_6500_GYRO_250_DPS_FULL_SCALE_RESOLUTION     0.0076
+#define MPU_6500_GYRO_500_DPS_FULL_SCALE_RESOLUTION     0.0153
+#define MPU_6500_GYRO_1000_DPS_FULL_SCALE_RESOLUTION    0.0305   
+#define MPU_6500_GYRO_2000_DPS_FULL_SCALE_RESOLUTION    0.0610  
+
 typedef struct{
     uint8_t register_h_data;
     uint8_t register_l_data;
@@ -42,6 +47,7 @@ typedef struct{
 void MPU_6500_lib_initialize();
 accel_data_t* get_accelerometer_data();
 gyro_data_t* get_gyroscope_data();
+uint8_t mpu_6500_who_am_i();
 
 
 #endif //_MPU_6500_LIB_H_
